@@ -40,58 +40,7 @@ if (isGetCookie = typeof $request !== 'undefined') {
     $.msg($.name, "您未获取中青Cookie", "请进入任务中心获取")
 } else {
     !(async() => {
-        if (!$.isNode() && cookieYouth.indexOf("#") == -1) {
-            cookieArr.push(cookieYouth),
-            readArr.push(artBody),
-            timeArr.push(readTimes)
-        } else {
-            if (!$.isNode() && cookieYouth.indexOf("#") > -1) {
-                cookieYouth = cookieYouth.split("#"),
-                    artBody = artBody.split("&"),
-                    readTimes = readTimes.split("&")
-            } else if ($.isNode()) {
-                if (process.env.YOUTH_HEADER && process.env.YOUTH_HEADER.indexOf('#') > -1) {
-                    cookieYouth = process.env.YOUTH_HEADER.split('#')
-                } else if (process.env.YOUTH_HEADER && process.env.YOUTH_HEADER.indexOf('\n') > -1) {
-                    cookieYouth = process.env.YOUTH_HEADER.split('\n')
-                } else {
-                    cookieYouth = [process.env.YOUTH_HEADER]
-                };
-                if (process.env.YOUTH_ARTBODY && process.env.YOUTH_ARTBODY.indexOf('&') > -1) {
-                    artBody = process.env.YOUTH_ARTBODY.split('&')
-                } else if (process.env.YOUTH_ARTBODY && process.env.YOUTH_ARTBODY.indexOf('\n') > -1) {
-                    artBody = process.env.YOUTH_ARTBODY.split('\n')
-                } else {
-                    artBody = [process.env.YOUTH_ARTBODY]
-                };
-                if (process.env.YOUTH_TIME && process.env.YOUTH_TIME.indexOf('&') > -1) {
-                    readTimes = process.env.YOUTH_TIME.split('&')
-                } else if (process.env.YOUTH_TIME && process.env.YOUTH_TIME.indexOf('\n') > -1) {
-                    readTimes = process.env.YOUTH_TIME.split('\n')
-                } else {
-                    readTimes = [process.env.YOUTH_TIME]
-                }
-            };
-            Object.keys(cookieYouth).forEach((item) => {
-                if (cookieYouth[item]) {
-                    cookieArr.push(cookieYouth[item])
-                }
-            });
-            Object.keys(artBody).forEach((item) => {
-                if (artBody[item]) {
-                    readArr.push(artBody[item])
-                }
-            });
-            Object.keys(readTimes).forEach((item) => {
-                if (readTimes[item]) {
-                    timeArr.push(readTimes[item])
-                }
-            })
-        };
-        timeZone = new Date().getTimezoneOffset() / 60;
-        timestamp = Date.now() + (8 + timeZone) * 60 * 60 * 1000;
-        bjTime = new Date(timestamp).toLocaleString('zh', {hour12: false, timeZoneName: 'long'});
-        $.log(`\n === 脚本执行${bjTime} === \n`);
+        await configApi();
         $.log(` =========== 您共提供${cookieArr.length}个中青账号 ==========`);
         if (!cookieArr[0]) {
             $.msg($.name, '【提示】请先获取中青看点一cookie', "", {'open-url': "https://kandian.youth.cn/u/mhkjN"});
@@ -107,7 +56,7 @@ if (isGetCookie = typeof $request !== 'undefined') {
             myuid = cookie.match(/uid=\d+/);
             await userInfo();
             nick = nick ? nick : null;
-            $.log(`\n ********** ${nick} 现金: ${cash}元 ********\n`);
+            $.log('\n ********** '+nick+' 现金: '+cash+'元 ********\n');
             await bonusTask();
             await TaskCenter();
             await openbox();
@@ -124,11 +73,11 @@ if (isGetCookie = typeof $request !== 'undefined') {
                 }
             }
             if (rotaryres.status == 1) {
-                $.desc += `【转盘抽奖】 + ${rotaryscore}个青豆剩余${rotarytimes}次\n`;
-                $.log(`转盘抽奖: 共计 + ${rotaryscore}个青豆剩余${rotarytimes}次`);
+                $.desc += '【转盘抽奖】 +'+rotaryscore+'个青豆 剩余'+rotarytimes+'次\n';
+                $.log(`转盘抽奖: 共计+${rotaryscore}个青豆 剩余${rotarytimes}次`);
                 if (doubleTimes !== 0) {
-                    $.desc += `【转盘双倍】 + ${doublerotary}青豆剩余${doubleTimes}次\n`;
-                    $.log(`转盘双倍: +${doublerotary}青豆剩余${doubleTimes}次`)
+                    $.desc += '【转盘双倍】 +' +doublerotary+'青豆 剩余'+doubleTimes+'次\n';
+                    $.log(`转盘双倍: +${doublerotary}青豆 剩余${doubleTimes}次`)
                 }
             }
             await earningsInfo();
@@ -179,7 +128,7 @@ function userInfo() {
                         await SevCont();
                     }
                 } else if (signinfo.data.is_sign == true) {
-                    $.desc = `【签到结果】🔁 (今天+${signinfo.data.sign_score}青豆)已连签${signday}天\n<本次收益> ：\n`
+                    $.desc = '【签到结果】🔁 (今天+'+signinfo.data.sign_score+'青豆)已连签'+signday+'天\n<本次收益> ：\n'
                 };
             } else {
                 $.log(signinfo.msg);
@@ -207,7 +156,7 @@ function TaskCenter() {
                         $.log("去" + title);
                         if (dailys.status == "2") {
                             $.log(title + "，" + button + "，已领取青豆" + dailys.score);
-                            $.desc += `【${title}】✅  ${dailys.score}青豆\n`
+                            $.desc += `【${title}】✅`+dailys.score+'青豆\n'
                         } else if (dailys.status == "1" && dailys.action != "") {
                             $.log(dailys.title + "已完成 ，去领取奖励青豆");
                             await $.wait(600);
@@ -262,7 +211,7 @@ function getsign() {
                 $.msg($.name, sub, "");
                 return;
             } else if (signres.status == 1) {
-                $.desc = `【签到结果】成功 🎉 青豆: +${signres.score}，明日青豆: +${signres.nextScore}\n`;
+                $.desc = `【签到结果】成功 🎉 青豆: +${signres.score}，明日青豆: +${signres.nextScore}`+'\n';
                 await comApp()
             }
             resolve()
@@ -316,12 +265,12 @@ function withDraw() {
         $.post(url, (error, resp, data) => {
             withDrawres = JSON.parse(data)
             if (withDrawres.error_code == 0) {
-                $.desc += `【自动提现】提现${withdrawcash}元成功\n`
+                $.desc += `【自动提现】提现${withdrawcash}元成功`+'\n'
                 $.msg($.name,$.sub,$.desc)
             } else if (withDrawres.error_code == "10002") {
                 $.log(`自动提现失败，${withDrawres.homeTime.text}`)
             } else {
-                $.log(`自动提现失败，${withDrawres.message}`)
+                $.log('自动提现失败,'+withDrawres.message)
             }
             resolve()
         })
@@ -357,10 +306,10 @@ function punchCard() {
         $.post(kdHost('WebApi/PunchCard/signUp'), (error, response, data) => {
             punchcardstart = JSON.parse(data);
             if (punchcardstart.code == 1) {
-                $.desc += `【打卡报名】打卡报名${punchcardstart.msg}✅\n`;
+                $.desc += '【打卡报名】打卡报名'+punchcardstart.msg+'✅\n';
                 $.log("每日报名打卡成功，报名时间:" + `${$.time('MM-dd HH:mm')}`)
             } else {
-                $.desc += `【打卡报名】🔔${punchcardstart.msg}\n`
+                $.desc += '【打卡报名】🔔'+punchcardstart.msg+'\n'
                     // $.log(punchcardstart.msg)
             }
             resolve();
@@ -374,7 +323,7 @@ function endCard() {
             $.post(kdHost('WebApi/PunchCard/doCard?'), async(error, resp, data) => {
                 punchcardend = JSON.parse(data);
                 if (punchcardend.code == 1) {
-                    $.desc += `【早起打卡】${punchcardend.data.card_time}${punchcardend.msg}✅ `;
+                    $.desc += '【早起打卡】'+punchcardend.data.card_time+","+punchcardend.msg+'✅\n';
                     $.log("早起打卡成功，打卡时间:" + `${punchcardend.data.card_time}`);
                     await $.wait(1000);
                     await Cardshare()
@@ -399,7 +348,7 @@ function Cardshare() {
                 $.post(kdHost('WebApi/PunchCard/shareEnd?'), (error, response, data) => {
                     shareres = JSON.parse(data);
                     if (shareres.code == 1) {
-                        $.desc += ` 打卡分享+${shareres.data.score}青豆\n`;
+                        $.desc += ` 打卡分享+${shareres.data.score}青豆`+"\n";
                         $.msg($.name, "", $.desc)
                     } else {
                         //$.desc += `【打卡分享】${shareres.msg}\n`
@@ -418,7 +367,7 @@ function SevCont() {
         $.post(kdHost('WebApi/PunchCard/luckdraw?'), async(error, resp, data) => {
             let sevres = JSON.parse(data);
             if (sevres.code == 1) {
-                $.desc += `【七日签到】 + ${sevres.data.score}青豆\n`
+                $.desc += `【七日签到】 + ${sevres.data.score}青豆`+'\n'
             } else if (sevres.code == 0) {
                 //$.desc += `【七日签到】${sevres.msg}\n`;
                 //$.log(`七日签到:${sevres.msg}`)
@@ -487,7 +436,8 @@ function friendsign() {
                 friendsitem = addsign.data.active_list;
                 for (friends of friendsitem) {
                     if (friends.button == 1) {
-                        await friendSign(friends.uid)
+                        await $.wait(2000)
+                        await friendSign(friends.uid,friends.nickname)
                     }
                 }
             }
@@ -496,13 +446,16 @@ function friendsign() {
     })
 }
 
-function friendSign(uid) {
+function friendSign(uid,friendnick) {
     return new Promise((resolve, reject) => {
         $.get(kdHost('WebApi/ShareSignNew/sendScoreV2?friend_uid=' + uid), (error, resp, data) => {
             let friendres = JSON.parse(data);
+//$.log(JSON.stringify(friendres,null,2))
             if (friendres.error_code == "0") {
                 $.desc += '【好友红包】+' + friendres.data[0].score + '个青豆\n';
-                $.log('好友签到，我得红包 +' + friendres.data[0].score + '个青豆')
+                $.log('您的好友'+friendnick+'已签到，我得红包 +' + friendres.data[0].score + '个青豆')
+            } else {
+             $.log(friendres.message)
             }
             resolve()
         })
@@ -568,7 +521,7 @@ function comApp() {
         $.post(batHost('mission/msgRed.json', articbody), (error, resp, data) => {
             comres = JSON.parse(data);
             if (comres.success == true) {
-                $.desc += `【回访奖励】+${comres.items.score}个青豆\n`
+                $.desc += '【回访奖励】+'+comres.items.score+'个青豆\n'
             }
             resolve()
         })
@@ -582,7 +535,7 @@ function readArticle() {
             try {
                 readres = JSON.parse(data);
                 if (data.indexOf('read_score') > -1 && readres.items.read_score != 0) {
-                    $.desc += `【阅读奖励】+${readres.items.read_score}个青豆\n`;
+                    $.desc += '【阅读奖励】+'+readres.items.read_score+'个青豆\n';
                     $.log(`阅读奖励 +${readres.items.read_score}个青豆`)
                 } else if (readres.items.max_notice == '看太久了，换1篇试试') {
                     //$.log(readres.items.max_notice)
@@ -602,7 +555,7 @@ function readTime() {
             let timeres = JSON.parse(data);
             if (timeres.error_code == 0) {
                 readtimes = timeres.time / 60;
-                $.desc += `【阅读时长】共计` + Math.floor(readtimes) + `分钟\n`;
+                $.desc += `【阅读时长】共计` + Math.floor(readtimes) + '分钟\n';
                 $.log('阅读时长共计' + Math.floor(readtimes) + '分钟')
             } else {
                 if (timeres.error_code == 200001) {
@@ -699,10 +652,10 @@ function runRotary(index) {
         $.post(kdHost(`WebApi/RotaryTable/chestReward?_=${Date.now()}&`, rotarbody), (error, resp, data) => {
             let rotaryresp = JSON.parse(data);
             if (rotaryresp.status == 1) {
-                $.desc += `【转盘宝箱${index}】+${rotaryresp.data.score}个青豆\n`
+                $.desc += `【转盘宝箱${index}】`+rotaryresp.data.score+'个青豆\n'
             } else {
                 if (rotaryresp.code == "10010") {
-                    $.desc += `【转盘宝箱${index}】+今日抽奖完成\n`
+                    $.desc += `【转盘宝箱${index}】`+'今日抽奖完成\n'
                 }
             }
             resolve();
@@ -731,7 +684,7 @@ function TurnDouble() {
 
 function earningsInfo() {
     return new Promise((resolve, reject) => {
-        $.get(kdHost(`wap/user/balance?` + cookie), (error, response, data) => {
+        $.get(kdHost('wap/user/balance?' + cookie), (error, response, data) => {
             infores = JSON.parse(data);
             if (infores.status == 0) {
                 $.desc += '<收益统计> ：\n'
@@ -746,7 +699,7 @@ function earningsInfo() {
 }
 async function showmsg() {
     if ($.isNode() && rotaryres.status !== 0 && rotarytimes && (100 - rotarytimes) % 95 == 0 && cash >= 10) {
-        await notify.sendNotify($.name + " " + nick, "您的余额约为" + cash + "元，已可以提现" + '\n' + $.sub + `\n${$.desc}`)
+        await notify.sendNotify($.name + " " + nick, "您的余额约为" + cash + "元，已可以提现" + '\n' + $.sub + '\n'+$.desc)
     } else if (rotaryres.status == 1 && rotarytimes >= 97) {
         $.msg($.name + " " + nick, $.sub, $.desc) //默认前三次为通知
     } else if (rotaryres.status == 1 && rotarytimes % notifyInterval == 0) {
@@ -757,6 +710,7 @@ async function showmsg() {
         console.log('\n' + $.sub + '\n' + $.desc)
     }
 }
+function configApi(){if(!$.isNode()&&cookieYouth.indexOf("#")==-1){cookieArr.push(cookieYouth),readArr.push(artBody),timeArr.push(readTimes)}else{if(!$.isNode()&&cookieYouth.indexOf("#")>-1){cookieYouth=cookieYouth.split("#"),artBody=artBody.split("&"),readTimes=readTimes.split("&")}else if($.isNode()){if(process.env.YOUTH_HEADER&&process.env.YOUTH_HEADER.indexOf('#')>-1){cookieYouth=process.env.YOUTH_HEADER.split('#')}else if(process.env.YOUTH_HEADER&&process.env.YOUTH_HEADER.indexOf('\n')>-1){cookieYouth=process.env.YOUTH_HEADER.split('\n')}else{cookieYouth=[process.env.YOUTH_HEADER]};if(process.env.YOUTH_ARTBODY&&process.env.YOUTH_ARTBODY.indexOf('&')>-1){artBody=process.env.YOUTH_ARTBODY.split('&')}else if(process.env.YOUTH_ARTBODY&&process.env.YOUTH_ARTBODY.indexOf('\n')>-1){artBody=process.env.YOUTH_ARTBODY.split('\n')}else{artBody=[process.env.YOUTH_ARTBODY]};if(process.env.YOUTH_TIME&&process.env.YOUTH_TIME.indexOf('&')>-1){readTimes=process.env.YOUTH_TIME.split('&')}else if(process.env.YOUTH_TIME&&process.env.YOUTH_TIME.indexOf('\n')>-1){readTimes=process.env.YOUTH_TIME.split('\n')}else{readTimes=[process.env.YOUTH_TIME]}};Object.keys(cookieYouth).forEach((item)=>{if(cookieYouth[item]){cookieArr.push(cookieYouth[item])}});Object.keys(artBody).forEach((item)=>{if(artBody[item]){readArr.push(artBody[item])}});Object.keys(readTimes).forEach((item)=>{if(readTimes[item]){timeArr.push(readTimes[item])}})};timeZone=new Date().getTimezoneOffset()/60;timestamp=Date.now()+(8+timeZone)*60*60*1000;bjTime=new Date(timestamp).toLocaleString('zh',{hour12:false,timeZoneName:'long'});$.log('\n === 脚本执行'+bjTime+' === \n')}
 
 function GetCookie(){if($request&&$request.method!=`OPTIONS`&&$request.url.match(/\/NewTaskIos\/getTaskList/)){RefererVal=$request.headers.Referer;signheaderVal=RefererVal.match(/&uid=\d+/)+RefererVal.match(/&cookie=[_a-zA-Z0-9-]+/)+RefererVal.match(/&cookie_id=[a-zA-Z0-9]+/);if(signheaderVal)$.setdata(signheaderVal,'youthheader_zq');$.log(`${$.name}获取Cookie: 成功, signheaderVal: $}`);$.msg($.name,`获取Cookie: 成功🎉`,``)}else if($request&&$request.method!=`OPTIONS`&&$request.url.match(/\/article\/info\/get/)){articlebodyVal=$request.url.split("?")[1];if(articlebodyVal)$.setdata(articlebodyVal,'read_zq');$.log(`${$.name}获取阅读: 成功, articbody: ${articlebodyVal}`);$.msg($.name,`获取阅读请求: 成功🎉`,``)}else if($request&&$request.method!=`OPTIONS`&&$request.url.match(/\/v5\/user\/stay/)){const timebodyVal=$request.body;if(timebodyVal)$.setdata(timebodyVal,'readtime_zq');$.log(`${$.name}获取阅读时长: 成功, timebodyVal: ${timebodyVal}`);$.msg($.name,`获取阅读时长: 成功🎉`,``)}else if($request&&$request.method!=`OPTIONS`&&$request.url.match(/\/withdraw\d?\.json/)){const withdrawVal=$request.body;const withdrawUrl=$request.url;if(withdrawVal)$.setdata(withdrawVal,'cashbody_zq');if(withdrawUrl)$.setdata(withdrawUrl,'cashurl_zq');$.log(`${$.name}, 获取提现请求: 成功, withdrawUrl: ${withdrawUrl}`);$.log(`${$.name}, 获取提现请求: 成功, withdrawBody: ${withdrawVal}`);$.msg($.name,`获取提现请求: 成功🎉`,``)}}
 
