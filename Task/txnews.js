@@ -15,18 +15,18 @@ let SignArr = [],SignUrl = "";
     detail = ``, subTitle = ``;
 let read_finish = "",video_finish="";
 if ($.isNode()) {
-    if (process.env.TXNEWS_COOKIE && process.env.TXNEWS_COOKIE.indexOf('&') > -1) {
-        CookieTxnews = process.env.TXNEWS_COOKIE.split('&');
+    if (process.env.TXNEWS_COOKIE && process.env.TXNEWS_COOKIE.indexOf('\n') > -1) {
+        CookieTxnews = process.env.TXNEWS_COOKIE.split('\n');
     } else {
         CookieTxnews = process.env.TXNEWS_COOKIE.split()
     };
-    if (process.env.TXNEWS_SIGN && process.env.TXNEWS_SIGN.indexOf('#') > -1) {
-        SignUrl = process.env.TXNEWS_SIGN.split('#');
+    if (process.env.TXNEWS_SIGN && process.env.TXNEWS_SIGN.indexOf('\n') > -1) {
+        SignUrl = process.env.TXNEWS_SIGN.split('\n');
     } else {
         SignUrl = process.env.TXNEWS_SIGN.split()
     };
-    if (process.env.TXNEWS_VIDEO && process.env.TXNEWS_VIDEO.indexOf('#') > -1) {
-        VideoUrl = process.env.TXNEWS_VIDEO.split('#');
+    if (process.env.TXNEWS_VIDEO && process.env.TXNEWS_VIDEO.indexOf('\n') > -1) {
+        VideoUrl = process.env.TXNEWS_VIDEO.split('\n');
     } else {
         VideoUrl = process.env.TXNEWS_VIDEO.split()
     };
