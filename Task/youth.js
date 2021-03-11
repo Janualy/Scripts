@@ -1,5 +1,5 @@
 /*
-更新时间: 2021-03-11 21:10
+更新时间: 2021-03-11 22:50
 赞赏:中青邀请码`46308484`,农妇山泉 -> 有点咸，万分感谢
 本脚本仅适用于中青看点极速版领取青豆
 食用说明请查看本仓库目录Taskconf/youth/readme.md，其中打卡挑战赛可通过Boxjs开关，报名时间为23点，早起打卡时间为早5点，报名需1000青豆押金，打卡成功可返1000+青豆，打卡失败则押金不予返还，请注意时间运行，
@@ -598,11 +598,24 @@ function bonusTask() {
             extrares = JSON.parse(data);
             if (extrares.status == 2) {
                 $.log("参数错误" + JSON.stringify(extrares))
-            } else if (extrares.status == 1 && extrares.data.taskList[0].status == 1) {
-                timestatus = extrares.data.taskList[0].status;
-                timetitle = extrares.data.taskList[0].name;
-                $.log(timetitle + "可领取，去领青豆");
+            } else if (extrares.status == 1){
+            for (extradata of extrares.data.taskList){
+              taskname = extradata.name,
+              action = extradata.action,
+              ription = extradata.description;
+              if(taskname=="计时红包"&&extradata.status==1){
+                $.log(taskname + "可领取，去领青豆");
                 await TimePacket()
+              } else if(taskname=="计时红包"&&extradata.status==0){
+                downtime = parseInt((extradata.total_time-extradata.countdown)/60);
+               $.log(taskname +"，时间倒计时"+downtime+"分钟")
+              } else if(extradata.status==1){
+               await ExtractShare();
+               $.log(taskname+"成功，领取"+extradata.score+extradata.unit)
+              } else if(extradata.status==0){
+               $.log("去"+taskname)
+              }
+             }
             }
             resolve()
         })
@@ -611,11 +624,12 @@ function bonusTask() {
 
 function TimePacket() {
     return new Promise((resolve, reject) => {
-        $.post(kdHost('WebApi/TimePacket/getReward', cookie), (error, resp, data) => {
+        $.post(kdHost('WebApi/TimePacket/getReward', cookie),async(error, resp, data) => {
             let timeres = JSON.parse(data);
             if (timeres.code == 1) {
                 $.log("获得" + timeres.data.score + "青豆");
-                $.desc += "【" + timetitle + "】获得" + timeres.data.score + "青豆\n"
+                $.desc += "【" + timetitle + "】获得" + timeres.data.score + "青豆\n";
+                await ExtraList()
             } else if (timeres.code == 0) {
                 $.log(timeres.msg)
             }
@@ -624,6 +638,17 @@ function TimePacket() {
     })
 }
 
+function ExtractShare() {
+    return new Promise((resolve, reject) => {
+        $.post(kdHost('WebApi/ShareNew/execExtractTask', cookie+'&action='+action), (error, resp, data) => {
+            let obj = JSON.parse(data);
+            if (obj.status == 0) {
+                $.log(obj.msg)
+            }
+            resolve()
+        })
+    })
+}
 //转盘任务
 function rotary() {
     return new Promise((resolve, reject) => {
