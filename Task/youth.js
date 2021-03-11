@@ -1,5 +1,5 @@
 /*
-更新时间: 2021-03-08 20:10
+更新时间: 2021-03-11 21:10
 赞赏:中青邀请码`46308484`,农妇山泉 -> 有点咸，万分感谢
 本脚本仅适用于中青看点极速版领取青豆
 食用说明请查看本仓库目录Taskconf/youth/readme.md，其中打卡挑战赛可通过Boxjs开关，报名时间为23点，早起打卡时间为早5点，报名需1000青豆押金，打卡成功可返1000+青豆，打卡失败则押金不予返还，请注意时间运行，
@@ -378,17 +378,31 @@ function SevCont() {
 }
 function Census() {
     return new Promise((resolve, reject) =>{
-    $.post(kdHost('u/7SmLX'),async(error, resp, data) =>{
-            await rewards()
+    $.post(kdHost('u/7BqOu'),async(error, resp, data) =>{
+            await toshare()
             resolve()
         })
     })
 }
-
+function toshare() {
+    return new Promise((resolve, reject) =>{
+    $.post(kdHost('WebApi/Promotion/shareRewardDoubleTwelve?'),async(error, resp, data) =>{
+         let obj = JSON.parse(data);
+         if(obj.error_code=="0"){
+          $.log("分享成功，获得"+obj.data+"青豆")
+         }else {
+         $.log("今日"+obj.message)
+         }
+         await rewards()
+         resolve()
+        })
+    })
+}
 function rewards() {
     return new Promise((resolve, reject) =>{
     $.post(kdHost('WebApi/Promotion/baseDoubleTwelve?'),(error, resp, data) =>{
-            resolve()
+         let obj = JSON.parse(data);
+         resolve()
         })
     })
 }
