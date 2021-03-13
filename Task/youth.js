@@ -596,56 +596,70 @@ function bonusTask() {
     return new Promise((resolve, reject) => {
         $.post(kdHost('WebApi/ShareNew/bereadExtraList'), async(error, resp, data) => {
             extrares = JSON.parse(data);
-            if (extrares.status == 2) {
-                $.log("参数错误" + JSON.stringify(extrares))
-            } else if (extrares.status == 1){
-            for (extradata of extrares.data.taskList){
-              taskname = extradata.name,
-              action = extradata.action,
-              ription = extradata.description;
-              if(taskname=="计时红包"&&extradata.status==1){
-                $.log(taskname + "可领取，去领青豆");
-                await TimePacket()
-              } else if(taskname=="计时红包"&&extradata.status==0){
-                downtime = parseInt((extradata.total_time-extradata.countdown)/60);
-               $.log(taskname +"，时间倒计时"+downtime+"分钟")
-              } else if(extradata.status==1){
-               await ExtractShare();
-               $.log(taskname+"成功，领取"+extradata.score+extradata.unit)
-              } else if(extradata.status==0){
-               $.log("去"+taskname)
-              }
-             }
+            try {
+                if (extrares.status == 2) {
+                    $.log("参数错误" + JSON.stringify(extrares))
+                } else if (extrares.status == 1) {
+                    for (extradata of extrares.data.taskList) {
+                        taskname = extradata.name,
+                            action = extradata.action,
+                            ription = extradata.description;
+                        if (taskname == "计时红包" && extradata.status == 1) {
+                            $.log(taskname + "可领取，去领青豆");
+                            await TimePacket()
+                        } else if (taskname == "计时红包" && extradata.status == 0) {
+                            downtime = parseInt((extradata.total_time - extradata.countdown) / 60);
+                            $.log(taskname + "，时间倒计时" + downtime + "分钟")
+                        } else if (extradata.status == 1) {
+                            await ExtractShare(action);
+                            $.log(taskname + "成功，领取" + extradata.score + extradata.unit)
+                        } else if (extradata.status == 0) {
+                            $.log("去" + taskname)
+                        }
+                    }
+                }
+            } catch (e) {
+                $.logErr(e + resp);
+            } finally {
+                resolve()
             }
-            resolve()
         })
     })
 }
 
 function TimePacket() {
     return new Promise((resolve, reject) => {
-        $.post(kdHost('WebApi/TimePacket/getReward', cookie),async(error, resp, data) => {
-            let timeres = JSON.parse(data);
-            if (timeres.code == 1) {
-                $.log("获得" + timeres.data.score + "青豆");
-                $.desc += "【" + timetitle + "】获得" + timeres.data.score + "青豆\n";
-                await ExtraList()
-            } else if (timeres.code == 0) {
-                $.log(timeres.msg)
+        $.post(kdHost('WebApi/TimePacket/getReward', cookie), async(error, resp, data) => {
+            try {
+                let timeres = JSON.parse(data);
+                if (timeres.code == 1) {
+                    $.log("获得" + timeres.data.score + "青豆");
+                    $.desc += "【" + taskname + "】获得" + timeres.data.score + "青豆\n";
+                } else if (timeres.code == 0) {
+                    $.log(timeres.msg)
+                }
+            } catch (e) {
+                $.logErr(e + resp);
+            } finally {
+                resolve()
             }
-            resolve()
         })
     })
 }
 
-function ExtractShare() {
+function ExtractShare(action) {
     return new Promise((resolve, reject) => {
-        $.post(kdHost('WebApi/ShareNew/execExtractTask', cookie+'&action='+action), (error, resp, data) => {
-            let obj = JSON.parse(data);
-            if (obj.status == 0) {
-                $.log(obj.msg)
+        $.post(kdHost('WebApi/ShareNew/execExtractTask', cookie + '&action=' + action), (error, resp, data) => {
+            try {
+                let obj = JSON.parse(data);
+                if (obj.status == 0) {
+                    $.log(obj.msg)
+                }
+            } catch (e) {
+                $.logErr(e + resp);
+            } finally {
+                resolve()
             }
-            resolve()
         })
     })
 }
