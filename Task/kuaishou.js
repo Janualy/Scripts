@@ -1,5 +1,5 @@
 /*
-更新时间: 2021-02-21 10:15
+更新时间: 2021-03-15 10:50
 赞赏:快手邀请码`774010415`,农妇山泉 -> 有点咸，万分感谢;
 本脚本仅适用于快手双版本签到，仅支持正式版获取多Cookie，建议使用正式版获取Cookie，点击视频页悬浮红包，或者进入设置，点击"积分兑好礼"即可;
 本脚本仅在签到成功时通知;
@@ -44,13 +44,13 @@ if (!$.isNode() && ks_tokens.indexOf('&') == -1) {
     timeZone = new Date().getTimezoneOffset() / 60;
     timestamp = Date.now()+ (8+timeZone) * 60 * 60 * 1000;
     bjTime = new Date(timestamp).toLocaleString('zh',{hour12:false,timeZoneName: 'long'})
-    console.log(`\n === 脚本执行 ${bjTime} ===\n`);
+    console.log(' === 脚本执行'+bjTime+' ===\n');
     console.log(` === 共 ${cookieArr.length}个 账号 === `)
  for (let i = 0; i < cookieArr.length; i++) {
     if (cookieArr[i]) {
       cookieVal = cookieArr[i];
       $.index = i + 1;
-      console.log(`\n------------------------\n\n开始【快手视频账号${$.index}】\n`)
+      console.log('\n------------------------\n\n开始【快手视频账号'+$.index+'】\n')
      await nebulaInfo();
      await nebulaPopup();
      await formalCenter();
@@ -58,13 +58,14 @@ if (!$.isNode() && ks_tokens.indexOf('&') == -1) {
   if(offici_code !== 100119){
      await formalinfo();
    }; 
-     $.desc = `【正式版】:\n  `+offic_info+"\n  "+offic_sign +'\n'
-     $.desc += `【极速版】:\n  `+speed_rewards+"\n  "+speed_info;
+     $.desc = '【正式版】:\n  '+offic_info+"\n  "+offic_sign +'\n'
+     $.desc += '【极速版】:\n  '+speed_rewards+"\n  "+speed_info;
     if(offici_code==1){
      $.msg($.name+"  昵称:"+nickname,"",$.desc);
      await notify.sendNotify($.name+ " " +nickname,$.desc)
     } else {
-     $.log( "~~~~~~~~~~~~~~~~~\n 昵称:" +nickname+"\n"+ $.desc)  
+     //$.log( "~~~~~~~~~~~~~~~~~\n 昵称:" +nickname+"\n"+ $.desc)  
+     $.msg($.name+ " 昵称:" +nickname,$.sub,$.desc)  
     }
    }
  }
