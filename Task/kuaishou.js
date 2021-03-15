@@ -254,7 +254,7 @@ function nebulaPopup() {
     $.get(nebulaHost('sign/query'), (error, resp, data) => {
       let result = JSON.parse(data);
      if (result.result == '1'){ 
-        speed_info = `${result.data.nebulaSignInPopup.subTitle}, ${result.data.nebulaSignInPopup.title}\n`
+        speed_info = `${result.data.nebulaSignInPopup.subTitle}, ${result.data.nebulaSignInPopup.title}`+'\n'
       }
     resolve()
      })
